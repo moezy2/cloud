@@ -1,24 +1,21 @@
+# Use official lightweight Python image
 FROM python:3.11-slim
 
-# Set working directory
+# Set work directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+# Install system deps
+RUN apt-get update && apt-get install -y build-essential
 
-# Copy requirements first for better caching
+# Install Python deps
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy source
 COPY . .
 
-# Expose port
-EXPOSE 5000
+# Expose the port Flask runs on
+EXPOSE 8080
 
-# Use gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "app:app"]
+# Run the app using gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
